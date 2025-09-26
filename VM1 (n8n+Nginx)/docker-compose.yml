@@ -1,1 +1,40 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    environment:
+      N8N_HOST=n8n.exemplo.com
+      N8N_PORT=5678
+      N8N_PROTOCOL=https
+
+      DB_TYPE=postgresdb
+      DB_POSTGRESDB_HOST=192.168.78.139
+      DB_POSTGRESDB_PORT=5432
+      DB_POSTGRESDB_DATABASE=n8n
+      DB_POSTGRESDB_USER=n8n
+      DB_POSTGRESDB_PASSWORD=superseguro
+
+      REDIS_HOST=192.168.78.139
+      REDIS_PORT=6379
+
+      GENERIC_TIMEZONE=America/Guayaquil
+
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_n8n
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/certs:/etc/nginx/certs
+    depends_on:
+      - n8n
 
